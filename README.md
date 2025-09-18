@@ -113,6 +113,14 @@ This section provides a checklist for deploying the application to a production 
         DEBUG=False
         ALLOWED_HOSTS=laureon.com,www.laureon.com
         DATABASE_URL='postgres://ProdUser:ProdPassword@prod-db-host:5432/laureon_slm_prod_db'
+
+        # --- Security Settings ---
+        SECURE_SSL_REDIRECT=True
+        SESSION_COOKIE_SECURE=True
+        CSRF_COOKIE_SECURE=True
+        SECURE_HSTS_SECONDS=31536000
+        SECURE_HSTS_INCLUDE_SUBDOMAINS=True
+        SECURE_HSTS_PRELOAD=True
         ```
 
 2.  **Collect Static Files:**

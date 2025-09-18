@@ -147,3 +147,34 @@ LOGIN_REDIRECT_URL = 'main_menu:main_menu'
 SESSION_COOKIE_AGE = 1800
 # Update the session expiry with each request, effectively creating an inactivity timer
 SESSION_SAVE_EVERY_REQUEST = True
+
+# ==============================================================================
+#  PRODUCTION-SPECIFIC SETTINGS
+# ==============================================================================
+
+if not DEBUG:
+    # --- Security Settings ---
+    # Redirect all non-HTTPS traffic to HTTPS
+    SECURE_SSL_REDIRECT = env.bool('SECURE_SSL_REDIRECT', default=True)
+    
+    # Use a secure cookie for the session ID
+    SESSION_COOKIE_SECURE = env.bool('SESSION_COOKIE_SECURE', default=True)
+    
+    # Use a secure cookie for the CSRF token
+    CSRF_COOKIE_SECURE = env.bool('CSRF_COOKIE_SECURE', default=True)
+    
+    # Prevent the browser from guessing the content type of a response
+    SECURE_CONTENT_TYPE_NOSNIFF = env.bool('SECURE_CONTENT_TYPE_NOSNIFF', default=True)
+    
+    # Enable the browser's built-in XSS protection
+    SECURE_BROWSER_XSS_FILTER = env.bool('SECURE_BROWSER_XSS_FILTER', default=True)
+    
+    # Set a strict transport security header to enforce HTTPS
+    # (Set this value in your .env file)
+    SECURE_HSTS_SECONDS = env.int('SECURE_HSTS_SECONDS', default=31536000) # One year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = env.bool('SECURE_HSTS_INCLUDE_SUBDOMAINS', default=True)
+    SECURE_HSTS_PRELOAD = env.bool('SECURE_HSTS_PRELOAD', default=True)
+
+    # --- Static Files ---
+    # Use Django's ManifestStaticFilesStorage for long-term caching of static files
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
