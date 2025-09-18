@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Permission
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.urls import reverse
@@ -67,7 +67,6 @@ class BulkCreatePasteFormTest(TestCase):
 
 class SampleControlAuthTest(TestCase):
     def setUp(self):
-        # We need a user to test authenticated views
         self.user = User.objects.create_user(username='testuser', password='password')
         loc_type = LocationType.objects.create(name="Shelf", can_store_samples=True)
         self.location = Location.objects.create(name="Shelf A", source_location_type=loc_type)
@@ -75,20 +74,20 @@ class SampleControlAuthTest(TestCase):
     def test_sample_control_list_redirects_if_not_logged_in(self):
         """Test that the main sample control page redirects if not logged in."""
         response = self.client.get(reverse('sample_control:sample_control'))
-        self.assertRedirects(response, '/accounts/login/?next=/sample_control/')
+        # FIX: The redirect URL needs to match your project's URL structure
+        self.assertRedirects(response, '/slm/accounts/login/?next=/slm/sample_control/')
 
-    def test_sample_control_list_accessible_if_logged_in(self):
+    def test_sample_control_list_accessible_if_logged_in_with_permission(self):
         """
-        Test that the main sample control page is accessible to an authenticated user.
-        Note: This test will fail until you add the 'view_sampleitem' permission.
+        Test that the main sample control page is accessible to an authenticated
+        user who has the correct permission.
         """
-        # To make this test pass, you would first need to give the user permission.
-        # from django.contrib.auth.models import Permission
-        # permission = Permission.objects.get(codename='view_sampleitem')
-        # self.user.user_permissions.add(permission)
+        # FIX: Get the required permission and assign it to the test user
+        permission = Permission.objects.get(codename='view_sampleitem')
+        self.user.user_permissions.add(permission)
 
         self.client.login(username='testuser', password='password')
         response = self.client.get(reverse('sample_control:sample_control'))
-        # For now, we expect a 403 Forbidden since the user doesn't have permissions yet.
-        # Once you add permissions, this should be self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.status_code, 403)
+        
+        # FIX: The test should now check for a 200 OK, not a 403 Forbidden
+        self.assertEqual(response.status_code, 200)
