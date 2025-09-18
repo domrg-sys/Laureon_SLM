@@ -1,0 +1,47 @@
+{% comment %}
+Renders a single item in the Sample Control explorer's location tree.
+
+This template is responsible for the structural `<li>` element of a tree node.
+It includes the generic `_location_tree_item_content.html` partial to render
+the location's details and then adds its own context-specific action buttons
+(e.g., "View Samples").
+
+It recursively includes itself to build out the full tree structure.
+
+Context Variables:
+  - location: The Location object instance to render.
+{% endcomment %}
+
+{% with children=location.effective_children %}
+<li class="location-node" {% if children %} data-parent="true"{% endif %}>
+    <div class="tree-item-content">
+        {# Include the shared partial to render the item's name, type, and toggle. #}
+        {% include "partials/_location_tree_item_content.html" with location=location children=children %}
+
+        {# --- Action buttons specific to the Sample Control explorer --- #}
+        <div class="tree-item-actions">
+            {# Only show the "View" button for locations that can store samples. #}
+            {% if location.source_location_type.can_store_samples %}
+                <a href="{% url 'sample_control:sample_location_detail' location_pk=location.pk %}" class="btn-icon btn-icon-blue" title="View Samples in {{ location.name }}">
+                    <span class="material-symbols-outlined">visibility</span>
+                </a>
+            {% else %}
+                {# Render a disabled button for locations that cannot hold samples. #}
+                <button type="button" class="btn-icon btn-icon-disable" title="This location type cannot store samples" disabled>
+                    <span class="material-symbols-outlined">visibility_off</span>
+                </button>
+            {% endif %}
+        </div>
+    </div>
+
+    {# If the location has children, create a nested list and recurse. #}
+    {% if children %}
+        <ul id="children-{{ location.pk }}" class="location-tree-children collapsed">
+            {% for child in children %}
+                {# --- RECURSION --- #}
+                {% include 'sample_control/partials/_location_tree_item.html' with location=child %}
+            {% endfor %}
+        </ul>
+    {% endif %}
+</li>
+{% endwith %}

@@ -1,0 +1,106 @@
+{% comment %}
+Renders a table of samples for locations that do not have spaces.
+
+This partial includes a toolbar with actions for adding single or bulk samples,
+as well as a button for bulk deleting selected samples from the table. The main
+content is a table that lists all samples in the current location.
+
+Context Variables:
+  - selected_location: The Location object instance whose samples are being displayed.
+  - samples: The queryset of SampleItem objects to display in the table.
+{% endcomment %}
+
+<form method="POST" action="{% url 'sample_control:sample_bulk_delete' location_pk=selected_location.pk %}" id="bulk-delete-table-form">
+    {% csrf_token %}
+
+    {# --- Toolbar with Add and Delete Actions --- #}
+    <div class="table-toolbar">
+        <div class="toolbar-button-group">
+            {# Button to add a single sample. #}
+            <a href="{% url 'sample_control:sample_add_to_location' location_pk=selected_location.pk %}" class="btn btn-green">
+                <span class="material-symbols-outlined">add</span>
+                Add Single Sample
+            </a>
+
+            {# A mini-form for creating a specific number of bulk samples. #}
+            <div class="bulk-add-by-number-form">
+                <input type="number" name="count" class="form-control-small" value="1" min="1" max="100">
+                <button
+                    type="submit"
+                    class="btn btn-green"
+                    formaction="{% url 'sample_control:sample_bulk_add_form' location_pk=selected_location.pk %}"
+                >
+                    <span class="material-symbols-outlined">playlist_add</span>
+                    Bulk Add
+                </button>
+            </div>
+        </div>
+        <div class="toolbar-button-group">
+            {# Button to delete all selected samples in the table. Enabled by JS. #}
+            <button type="submit" class="btn btn-red" id="bulk-delete-table-btn" disabled>
+                <span class="material-symbols-outlined">delete</span>
+                Delete Selected
+            </button>
+        </div>
+    </div>
+
+    {# --- Table of Samples --- #}
+    <table class="table" id="sample-table">
+        <thead>
+            <tr>
+                <th class="cell-checkbox"><input type="checkbox" id="select-all-checkbox" title="Select all"></th>
+                <th>Name</th>
+                <th>Catalog Number</th>
+                <th>Lot Number</th>
+                <th class="cell-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sample in samples %}
+                <tr>
+                    <td class="cell-checkbox">
+                        <input type="checkbox" name="selected_samples" value="{{ sample.pk }}" class="sample-checkbox">
+                    </td>
+                    <td>{{ sample.name }}</td>
+                    <td>{{ sample.catalog_number|default:"-" }}</td>
+                    <td>{{ sample.lot_number|default:"-" }}</td>
+                    <td class="cell-center">
+                        <a href="{% url 'sample_control:sample_detail' sample_pk=sample.pk %}" class="btn-icon btn-icon-blue" title="View Details">
+                            <span class="material-symbols-outlined">visibility</span>
+                        </a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5">
+                        <div class="empty-state">
+                            <span class="material-symbols-outlined">labs</span>
+                            <h3>No Samples Found</h3>
+                            <p>There are no samples stored in this location. Add one to get started.</p>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</form>
+
+{% if is_paginated %}
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1" class="btn btn-gray">&laquo; first</a>
+                <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-gray">previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="btn btn-gray">next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-gray">last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+{% endif %}

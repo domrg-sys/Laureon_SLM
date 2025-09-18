@@ -1,0 +1,25 @@
+{% comment %}
+A reusable partial for rendering a deletion confirmation form.
+
+This template provides a consistent user interface for confirming the deletion
+of any object in the application.
+
+Context Variables:
+  - object_type: The type of object being deleted (e.g., "Location Type").
+  - object_name: The name of the specific object instance being deleted.
+  - cancel_url: The URL to redirect to if the user cancels the action.
+{% endcomment %}
+
+<p>
+    Are you sure you want to delete the {{ object_type }}:
+    <strong>{{ object_name }}</strong>?
+</p>
+<p>This action cannot be undone.</p>
+
+<form method="post">
+    {% csrf_token %}
+    <div class="form-actions">
+        <a href="{{ cancel_url }}" class="btn btn-gray">Cancel</a>
+        <button type="submit" class="btn btn-red">Confirm Delete</button>
+    </div>
+</form>

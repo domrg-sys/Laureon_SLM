@@ -1,0 +1,103 @@
+{% comment %}
+Renders the main content for the "Types" tab in Location Configuration.
+
+This partial includes a toolbar with an "Add New Type" button and a table
+that lists all existing LocationType objects. The table displays key properties
+of each type and provides action buttons to edit or delete them.
+
+Context Variables:
+  - location_types: A queryset or list of all LocationType objects to be
+                    displayed in the table.
+{% endcomment %}
+
+<div class="table-toolbar">
+    <div class="toolbar-button-group">
+        <a href="{% url 'location_configuration:location_type_add' %}" class="btn btn-green">
+            <span class="material-symbols-outlined">add</span>
+            Add New Type
+        </a>
+    </div>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Allowed Parents</th>
+            <th class="cell-center">Stores Samples</th>
+            <th class="cell-center">Grid Dimensions</th>
+            <th class="cell-center">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for location_type in location_types %}
+            <tr>
+                <td>{{ location_type.name }}</td>
+                <td>
+                    {% for parent in location_type.allowed_parent_types.all %}
+                        {{ parent.name }}{% if not forloop.last %}, {% endif %}
+                    {% empty %}
+                        -
+                    {% endfor %}
+                </td>
+                <td class="cell-center">
+                    {% include "partials/_boolean_icon.html" with value=location_type.can_store_samples %}
+                </td>
+                <td class="cell-center">
+                    {% if location_type.can_have_spaces %}
+                        {{ location_type.space_rows }}x{{ location_type.space_cols }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td class="cell-center">
+                    {# --- Action Buttons --- #}
+                    <a href="{% url 'location_configuration:location_type_edit' pk=location_type.pk %}" class="btn-icon btn-icon-blue" title="Edit {{ location_type.name }}">
+                        <span class="material-symbols-outlined">edit</span>
+                    </a>
+
+                    {# The "Delete" button is disabled if the location type is in use. #}
+                    {% if location_type.in_use %}
+                        <button type="button" class="btn-icon btn-icon-disable" title="Cannot delete because this type is in use" disabled>
+                            <span class="material-symbols-outlined">delete</span>
+                        </button>
+                    {% else %}
+                        <a href="{% url 'location_configuration:location_type_delete' pk=location_type.pk %}" class="btn-icon btn-icon-red" title="Delete {{ location_type.name }}">
+                            <span class="material-symbols-outlined">delete</span>
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="5">
+                    <div class="empty-state">
+                        <span class="material-symbols-outlined">category</span>
+                        <h3>No Location Types Found</h3>
+                        <p>Get started by adding a new location type.</p>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% if is_paginated %}
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1" class="btn btn-gray">&laquo; first</a>
+                <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-gray">previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="btn btn-gray">next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-gray">last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+{% endif %}

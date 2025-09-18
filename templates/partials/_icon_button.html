@@ -1,0 +1,25 @@
+{% comment %}
+Renders a reusable, standalone icon button.
+
+This partial is designed for creating clickable buttons that only contain an
+icon, often used for actions in tables or toolbars.
+
+Context Variables:
+  - icon_name: The name of the Material Symbols icon to display.
+  - aria_label: The accessible label for screen readers. This is crucial for
+                accessibility and is also used for the tooltip.
+  - extra_classes (optional): Additional CSS classes to apply to the button
+                              for custom styling (e.g., 'btn-icon-red').
+  - modal_target (optional): The ID of a modal element to target, intended for
+                             use with JavaScript to open a modal on click.
+{% endcomment %}
+
+<button
+    type="button"
+    class="btn-icon {{ extra_classes|default:'' }}"
+    aria-label="{{ aria_label }}"
+    title="{{ aria_label }}"
+    {% if modal_target %}data-modal-target="{{ modal_target }}"{% endif %}
+>
+    <span class="material-symbols-outlined">{{ icon_name }}</span>
+</button>

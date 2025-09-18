@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% comment %}
+Serves as the main landing page for the Sample Control application.
+
+This template provides the primary user interface for finding and navigating to
+samples. It includes a search bar at the top and a hierarchical tree view of all
+storage locations.
+
+Context Variables:
+  - all_locations: A queryset or list of all Location objects, which is passed
+                   to the location tree partial to render the navigation tree.
+{% endcomment %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'sample_control/css/sample_main.css' %}">
+{% endblock extra_css %}
+
+{% block page_actions_top %}
+    <div class="page-actions-top-left">
+        <a href="{% url 'main_menu:main_menu' %}" class="btn btn-gray">
+            <span class="material-symbols-outlined">arrow_back</span>
+            Back to Main Menu
+        </a>
+    </div>
+{% endblock page_actions_top %}
+
+{% block page_title %}
+    Sample Control
+{% endblock page_title %}
+
+{% block content %}
+    <div class="sample-explorer-container">
+        <div class="search-bar">
+            <form action="{% url 'sample_control:sample_search_results' %}" method="get" class="search-form">
+                <span class="material-symbols-outlined">search</span>
+                <input type="search" name="q" placeholder="Search by name, lot number, or description..." class="search-input">
+                <button type="submit" class="btn btn-blue">Search</button>
+            </form>
+        </div>
+
+        <div class="table-toolbar">
+            <div class="toolbar-button-group">
+                {# This group is intentionally empty for alignment purposes. #}
+            </div>
+            <div class="toolbar-button-group">
+                <button type="button" class="btn btn-gray" id="expand-all-btn">
+                    <span class="material-symbols-outlined">unfold_more</span>
+                    Expand All
+                </button>
+                <button type="button" class="btn btn-gray" id="collapse-all-btn">
+                    <span class="material-symbols-outlined">unfold_less</span>
+                    Collapse All
+                </button>
+            </div>
+        </div>
+
+        {% include "sample_control/partials/_location_tree.html" with locations=all_locations %}
+    </div>
+{% endblock content %}

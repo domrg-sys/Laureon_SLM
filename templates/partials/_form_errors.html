@@ -1,0 +1,28 @@
+{% comment %}
+A reusable partial for displaying form errors at the top of a form.
+
+This template handles both non-field errors (general form issues like "Please
+correct the errors below") and field-specific errors, presenting them in a
+single, clearly styled list for the user.
+
+Context Variables:
+  - form: The Django form instance passed from the view.
+{% endcomment %}
+
+{% if form.errors %}
+    <div class="form-errors">
+        <ul>
+            {# Display non-field errors first (errors that don't belong to a specific field). #}
+            {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+
+            {# Then, iterate through all fields and display their specific errors. #}
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}

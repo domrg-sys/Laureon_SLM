@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% comment %}
+Renders the main menu page for the application.
+
+This template displays a grid of large, clickable navigation buttons that
+serve as the primary entry points into the different sections of the site,
+such as "Location Configuration" and "Sample Control".
+
+It also includes logic to display disabled buttons for sections that the
+current user does not have permission to view.
+
+Context Variables:
+  - None
+{% endcomment %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'main_menu/main_menu_styles.css' %}">
+{% endblock extra_css %}
+
+{% block page_title %}
+    Main Menu
+{% endblock page_title %}
+
+{% block content %}
+    <div class="main-menu-grid">
+
+        {# --- Site Administration Button (Enabled based on admin permissions) --- #}
+        {% if perms.admin.view_logentry %}
+            <a href="{% url 'admin:index' %}" class="btn-menu btn-blue">
+                <span class="material-symbols-outlined">admin_panel_settings</span>
+                <span>Site Administration</span>
+            </a>
+        {% else %}
+            <div class="btn-menu btn-menu--disabled">
+                <span class="material-symbols-outlined">lock</span>
+                <span>Site Administration</span>
+            </div>
+        {% endif %}
+
+        {# --- Location Configuration Button --- #}
+        {% if perms.location_configuration.view_locationconfiguration_page %}
+            <a href="{% url 'location_configuration:location_configuration' %}" class="btn-menu btn-blue">
+                <span class="material-symbols-outlined">location_on</span>
+                <span>Location Configuration</span>
+            </a>
+        {% else %}
+            <div class="btn-menu btn-menu--disabled">
+                <span class="material-symbols-outlined">lock</span>
+                <span>Location Configuration</span>
+            </div>
+        {% endif %}
+
+        {# --- Sample Control Button --- #}
+        {% if perms.sample_control.view_samplecontrol_page %}
+            <a href="{% url 'sample_control:sample_control' %}" class="btn-menu btn-blue">
+                <span class="material-symbols-outlined">labs</span>
+                <span>Sample Control</span>
+            </a>
+        {% else %}
+            <div class="btn-menu btn-menu--disabled">
+                <span class="material-symbols-outlined">lock</span>
+                <span>Sample Control</span>
+            </div>
+        {% endif %}
+
+    </div>
+{% endblock content %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% comment %}
+Acts as the main page and router for the Location Configuration section.
+
+This template displays the tab navigation ("Locations" and "Types") and then
+dynamically includes the content partial corresponding to the `active_tab`
+variable provided by the view. This allows a single URL endpoint to serve
+multiple views, controlled by the tab selection.
+
+Context Variables:
+  - tabs: A list of dictionaries for rendering the tab navigator partial.
+  - active_tab: The slug of the currently active tab (e.g., "locations" or
+                "types"), used to determine which content partial to include.
+{% endcomment %}
+
+{% block page_actions_top %}
+    <div class="page-actions-top-left">
+        <a href="{% url 'main_menu:main_menu' %}" class="btn btn-gray">
+            <span class="material-symbols-outlined">arrow_back</span>
+            Back to Main Menu
+        </a>
+    </div>
+{% endblock page_actions_top %}
+
+{% block page_title %}
+    Location Configuration
+{% endblock page_title %}
+
+{% block content %}
+    {% comment %}Render the tab navigation component. {% endcomment %}
+    {% include "partials/_tab_navigator.html" with tabs=tabs active_tab=active_tab %}
+
+    {% comment %}Dynamically include the correct content partial based on the active tab's slug.
+       For example, if active_tab is "locations", this will include
+       "location_configuration/partials/_locations.html". {% endcomment %}
+    {% include "location_configuration/partials/_"|add:active_tab|add:".html" %}
+{% endblock content %}

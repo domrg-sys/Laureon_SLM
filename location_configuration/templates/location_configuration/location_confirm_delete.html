@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% comment %}
+Displays a confirmation page for deleting a Location or LocationType.
+
+This template acts as a simple wrapper. It includes the generic
+`_confirm_delete_form.html` partial, which provides the standard user
+interface for all deletion confirmations in the project.
+
+Context Variables:
+  - All context required by the `_confirm_delete_form.html` partial,
+    specifically `object_type`, `object_name`, and `cancel_url`, must be
+    provided by the view rendering this template.
+{% endcomment %}
+
+{% block page_title %}
+    Confirm Deletion
+{% endblock page_title %}
+
+{% block content %}
+    {% include "partials/_confirm_delete_form.html" %}
+{% endblock content %}

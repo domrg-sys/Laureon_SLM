@@ -1,0 +1,14 @@
+{% comment %}
+Renders the space grid for a specific location in the Sample Control app.
+
+This template acts as a simple wrapper that includes the more specific
+`_sample_space_grid.html` partial, passing the necessary context to it.
+This separation keeps the templates organized and reusable.
+
+Context Variables:
+  - selected_location: The Location object instance whose grid is being displayed.
+                       This is passed to the child template as `parent_location`.
+  - grid: The 2D list representing the grid of spaces for the location.
+{% endcomment %}
+
+{% include "sample_control/partials/_sample_space_grid.html" with parent_location=selected_location grid=grid %}

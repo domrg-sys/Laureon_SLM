@@ -1,0 +1,49 @@
+{% comment %}
+Renders the main content for the "Locations" tab.
+
+This partial includes a toolbar with actions for managing the location tree
+(e.g., "Add Top-level Location", "Expand/Collapse All") and then renders the
+hierarchical location tree itself.
+
+Context Variables:
+  - locations: A queryset or list of all Location objects.
+  - show_actions: A boolean passed down to the tree item partial to control
+                  the visibility of action buttons like Edit and Delete.
+{% endcomment %}
+
+<div class="table-toolbar">
+    <div class="toolbar-button-group">
+        <a href="{% url 'location_configuration:location_add_toplevel' %}" class="btn btn-green">
+            <span class="material-symbols-outlined">add</span>
+            Add New Top-level Location
+        </a>
+    </div>
+    <div class="toolbar-button-group">
+        <button type="button" class="btn btn-gray" id="expand-all-btn">
+            <span class="material-symbols-outlined">unfold_more</span>
+            Expand All
+        </button>
+        <button type="button" class="btn btn-gray" id="collapse-all-btn">
+            <span class="material-symbols-outlined">unfold_less</span>
+            Collapse All
+        </button>
+    </div>
+</div>
+
+<ul class="location-tree">
+    {# The for loop now includes an {% empty %} block to handle the case with no locations. #}
+    {% for location in locations %}
+        {% if not location.effective_parent %}
+            {# Start the recursive rendering for each top-level location. #}
+            {% include 'partials/_location_tree_item.html' with location=location show_actions=show_actions %}
+        {% endif %}
+    {% empty %}
+        <li>
+            <div class="empty-state">
+                <span class="material-symbols-outlined">warehouse</span>
+                <h3>No Locations Found</h3>
+                <p>Get started by adding a new top-level location.</p>
+            </div>
+        </li>
+    {% endfor %}
+</ul>

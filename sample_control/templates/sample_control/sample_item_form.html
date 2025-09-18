@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% comment %}
+Renders the form for creating a new SampleItem.
+
+This template displays the fields required to create a new sample, including
+read-only fields that show the parent location and, if applicable, the
+specific space where the new sample will be stored.
+
+Context Variables:
+  - form: An instance of the SampleItemCreateForm.
+  - parent_location: The Location object where the new sample will be created.
+{% endcomment %}
+
+{% block page_title %}
+    Add New Sample
+{% endblock page_title %}
+
+{% block content %}
+    <form method="post" novalidate class="form-container">
+        {% csrf_token %}
+        {% include "partials/_form_errors.html" with form=form %}
+
+        <div class="form-section">
+            <h2 class="form-section-title">Storage Details</h2>
+            {# These fields are disabled and are for display purposes only. #}
+            {% include "partials/_form_field.html" with field=form.location_display %}
+            {% if form.space_display %}
+                {% include "partials/_form_field.html" with field=form.space_display %}
+            {% endif %}
+        </div>
+
+        <div class="form-section">
+            <h2 class="form-section-title">Sample Information</h2>
+            {% include "partials/_form_field.html" with field=form.name %}
+            {% include "partials/_form_field.html" with field=form.catalog_number %}
+            {% include "partials/_form_field.html" with field=form.lot_number %}
+            {% include "partials/_form_field.html" with field=form.description %}
+        </div>
+
+        <div class="form-actions">
+            <a href="{% url 'sample_control:sample_location_detail' location_pk=parent_location.pk %}" class="btn btn-gray">Cancel</a>
+            <button type="submit" class="btn btn-green">Save Sample</button>
+        </div>
+    </form>
+{% endblock content %}

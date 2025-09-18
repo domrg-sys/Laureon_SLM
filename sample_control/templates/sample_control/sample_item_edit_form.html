@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% comment %}
+Renders the form for editing an existing SampleItem.
+
+This template provides the user interface for modifying the details of a
+single sample.
+
+Context Variables:
+  - form: An instance of the SampleItemEditForm.
+  - object: The SampleItem instance being edited (passed by UpdateView).
+{% endcomment %}
+
+{% block page_title %}
+    Edit Sample
+{% endblock page_title %}
+
+{% block content %}
+    <form method="post" novalidate class="form-container">
+        {% csrf_token %}
+        {% include "partials/_form_errors.html" with form=form %}
+
+        <div class="form-section">
+            <h2 class="form-section-title">Sample Information</h2>
+            {% include "partials/_form_field.html" with field=form.name %}
+            {% include "partials/_form_field.html" with field=form.lot_number %}
+            {% include "partials/_form_field.html" with field=form.description %}
+        </div>
+
+        <div class="form-actions">
+            <a href="{% url 'sample_control:sample_detail' sample_pk=object.pk %}" class="btn btn-gray">Cancel</a>
+            <button type="submit" class="btn btn-green">Save Changes</button>
+        </div>
+    </form>
+{% endblock content %}

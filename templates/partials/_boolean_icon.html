@@ -1,0 +1,17 @@
+{% comment %}
+Renders a boolean value as a colored icon.
+
+This partial provides a consistent visual representation for true/false or
+yes/no values across the application, typically used in tables.
+
+Context Variables:
+  - value: The boolean value to render (True or False).
+{% endcomment %}
+
+{% if value %}
+    {# Display a green checkmark for a True value. #}
+    <span class="material-symbols-outlined text-green" title="Yes">check_circle</span>
+{% else %}
+    {# Display a red 'cancel' icon for a False value. #}
+    <span class="material-symbols-outlined text-red" title="No">cancel</span>
+{% endif %}

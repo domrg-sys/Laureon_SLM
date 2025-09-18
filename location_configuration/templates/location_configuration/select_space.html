@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% comment %}
+Presents a page for a user to select an empty space within a parent location.
+
+This template displays a visual grid of a location's spaces, allowing the user
+to choose an available slot to place a new child location. It includes the
+reusable `_space_grid.html` partial to render the actual grid.
+
+Context Variables:
+  - parent_location: The Location object instance whose spaces are being displayed.
+  - grid: A 2D list representing the grid of spaces for the location.
+  - page_title: The title to be displayed at the top of the page.
+{% endcomment %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/space_grid.css' %}">
+{% endblock extra_css %}
+
+{% block page_title %}
+    {{ page_title }}
+{% endblock page_title %}
+
+{% block content %}
+    <p>
+        Select an available space in <strong>{{ parent_location.name }}</strong>
+        to add a new child location.
+    </p>
+
+    {# Include the reusable partial to render the grid of spaces. #}
+    <div class="grid-container-scrollable">
+        {% include "partials/_space_grid.html" %}
+    </div>
+
+    <div class="form-actions">
+        <a href="{% url 'location_configuration:locations' %}" class="btn btn-gray">Cancel</a>
+    </div>
+{% endblock content %}

@@ -1,0 +1,66 @@
+{% comment %}
+Renders the content of a single tree item, including its details and actions.
+
+This partial is designed to be reusable and is included by other tree partials
+(like _location_tree_item.html) to avoid duplicating code. It handles the
+display of the location's name, type, expand/collapse button, and a set of
+action buttons that are conditionally displayed.
+
+Context Variables:
+  - location: The Location object instance to render.
+  - children: The queryset or list of the location's effective children.
+  - show_actions (optional): A boolean that determines whether to display the
+                            action buttons (e.g., Edit, Delete).
+{% endcomment %}
+
+{# --- Main Details Section --- #}
+<div class="tree-item-details {% if location.source_location_type.can_store_samples %}can-store-samples{% else %}cannot-store-samples{% endif %}">
+    {% if children %}
+        <button
+            type="button"
+            class="btn-icon tree-toggle-btn"
+            data-target="#children-{{ location.pk }}"
+            aria-label="Toggle children of {{ location.name }}"
+        >
+            <span class="material-symbols-outlined">expand_more</span>
+        </button>
+    {% else %}
+        {# This placeholder ensures alignment with parent items that have a toggle button. #}
+        <span class="tree-toggle-placeholder"></span>
+    {% endif %}
+
+    <span class="tree-item-name">{{ location.name }}</span>
+    <span class="tree-item-type">({{ location.source_location_type.name }})</span>
+</div>
+
+{# --- Actions Section (Conditionally Rendered) --- #}
+{% if show_actions %}
+    <div class="tree-item-actions">
+        {# The "Add Child" button's URL depends on whether the location is a grid container. #}
+        {% if location.source_location_type.can_have_spaces %}
+            <a href="{% url 'location_configuration:location_select_space' parent_pk=location.pk %}" class="btn-icon btn-icon-green" title="Add Child Location">
+                <span class="material-symbols-outlined">add</span>
+            </a>
+        {% else %}
+            <a href="{% url 'location_configuration:location_add_child' parent_pk=location.pk %}" class="btn-icon btn-icon-green" title="Add Child Location">
+                <span class="material-symbols-outlined">add</span>
+            </a>
+        {% endif %}
+
+        {# --- Edit Button --- #}
+        <a href="{% url 'location_configuration:location_edit' pk=location.pk %}" class="btn-icon btn-icon-blue" title="Edit {{ location.name }}">
+            <span class="material-symbols-outlined">edit</span>
+        </a>
+
+        {# The "Delete" button is disabled if the location is in use. #}
+        {% if location.is_in_use %}
+            <button type="button" class="btn-icon btn-icon-disable" title="Cannot delete '{{ location.name }}' because it is in use" disabled>
+                <span class="material-symbols-outlined">delete</span>
+            </button>
+        {% else %}
+            <a href="{% url 'location_configuration:location_delete' pk=location.pk %}" class="btn-icon btn-icon-red" title="Delete {{ location.name }}">
+                <span class="material-symbols-outlined">delete</span>
+            </a>
+        {% endif %}
+    </div>
+{% endif %}

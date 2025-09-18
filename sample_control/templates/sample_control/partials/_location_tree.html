@@ -1,0 +1,20 @@
+{% comment %}
+Renders the container for the location tree navigation in the Sample Control app.
+
+This template serves as the entry point for the entire tree. It iterates
+through the provided locations and only renders the top-level ones (those
+without an effective parent), including the `_location_tree_item.html`
+partial to handle the recursive rendering of the entire hierarchy.
+
+Context Variables:
+  - locations: A queryset or list of all Location objects to be displayed.
+{% endcomment %}
+
+<ul class="location-tree">
+    {% for location in locations %}
+        {% if not location.effective_parent %}
+            {# Start the recursive rendering for each top-level location. #}
+            {% include 'sample_control/partials/_location_tree_item.html' with location=location %}
+        {% endif %}
+    {% endfor %}
+</ul>

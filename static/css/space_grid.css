@@ -1,0 +1,120 @@
+/**
+ * Styles for the space selection grid component.
+ *
+ * This component is used to visually represent the grid of spaces within a
+ * container location, allowing users to see which spaces are occupied and to
+ * select available ones.
+ */
+
+/* ==========================================================================
+   1. Grid Container
+   ========================================================================== */
+
+.space-grid {
+    display: grid;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+/* ==========================================================================
+   2. Base Cell Styles
+   ========================================================================== */
+
+/* --- Block: .space-cell --- */
+.space-cell {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 80px;
+    padding: 1rem;
+    border: 1px solid var(--color-gray-2);
+    border-radius: 4px;
+    text-align: center;
+    transition: all 0.2s ease-in-out; /* Base transition for all cells */
+}
+
+/* --- Elements within .space-cell --- */
+.space-coords {
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.occupant-type {
+    margin-top: 0.25rem;
+    font-size: 0.8rem;
+    text-transform: capitalize;
+}
+
+.occupant-name {
+    margin-top: 0.25rem;
+    font-size: 0.8rem;
+    word-break: break-word; /* Prevents long names from breaking the layout */
+}
+
+/* ==========================================================================
+   3. Cell State Modifiers
+   ========================================================================== */
+
+/* Modifier for available (empty) cells */
+.space-cell.space-available {
+    background-color: var(--color-primary-3); /* White */
+    color: var(--color-gray-4);
+    text-decoration: none;
+    font-weight: 600;
+    border: 1px dashed var(--color-gray-2);
+}
+
+.space-cell.space-available:hover {
+    background-color: var(--color-gray-1);
+    border-color: var(--color-gray-3);
+}
+
+/* Modifier for cells occupied by an item not relevant in the current context */
+.space-cell.space-occupied {
+    background-color: var(--color-gray-1);
+    color: var(--color-gray-3);
+    cursor: not-allowed;
+}
+
+/* Modifier for cells with a relevant item (e.g., a sample in the sample explorer) */
+.space-cell.space-interactable {
+    background-color: rgba(49, 155, 66, 0.1); /* Transparent green */
+    color: var(--color-primary-2);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* Hover effect for interactable cells that are also links */
+a.space-cell.space-interactable:hover {
+    background-color: var(--color-primary-2);
+    color: var(--color-primary-3);
+}
+
+/* ==========================================================================
+   4. JavaScript-Driven Selection Modes
+   ========================================================================== */
+
+/* --- Add Mode --- */
+.selection-mode .space-available {
+    cursor: pointer;
+}
+
+/* Modifier for a cell selected in 'add' mode */
+.space-cell.is-selected {
+    border-color: var(--color-secondary-6); /* Blue */
+    box-shadow: 0 0 0 3px rgba(6, 3, 141, 0.2);
+    background-color: var(--color-gray-1);
+}
+
+/* --- Delete Mode --- */
+.selection-mode-delete .space-interactable {
+    cursor: pointer;
+}
+
+/* Modifier for a cell selected in 'delete' mode */
+.space-cell.is-selected-delete {
+    border-color: var(--color-secondary-2); /* Red */
+    box-shadow: 0 0 0 3px rgba(249, 56, 34, 0.2);
+    background-color: rgba(249, 56, 34, 0.1);
+}

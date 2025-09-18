@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% comment %}
+Renders the form for creating and editing a Location.
+
+This template serves a dual purpose for both creating new locations and
+editing existing ones. It dynamically adjusts its title and the fields it
+displays based on the context provided by the view.
+
+Context Variables:
+  - form: An instance of either LocationCreateForm or LocationEditForm.
+  - parent_location (optional): The parent Location object, provided when
+                                creating a child location.
+{% endcomment %}
+
+{% block page_title %}
+    {% comment %} This block dynamically sets the page title based on the action. {% endcomment %}
+    {% if form.instance.pk %}
+        Edit {{ form.instance.name }}
+    {% elif parent_location and form.space_display.initial %}
+        Add Location in {{ parent_location.name }}
+    {% elif parent_location %}
+        Add Child Location to {{ parent_location.name }}
+    {% else %}
+        Add New Top-level Location
+    {% endif %}
+{% endblock page_title %}
+
+{% block content %}
+    <form method="post" novalidate class="form-container">
+        {% csrf_token %}
+        {% include "partials/_form_errors.html" with form=form %}
+
+        <div class="form-section">
+            {% comment %} --- Display-Only Parent/Space Fields --- {% endcomment %}
+            {% comment %} These fields are disabled in the form and shown for context. {% endcomment %}
+            {% if form.parent_display %}
+                {% include "partials/_form_field.html" with field=form.parent_display %}
+            {% endif %}
+            {% if form.space_display %}
+                {% include "partials/_form_field.html" with field=form.space_display %}
+            {% endif %}
+
+            {% comment %} --- Editable Fields --- {% endcomment %}
+            {% include "partials/_form_field.html" with field=form.name %}
+
+            {% comment %} This logic handles the different fields for create vs. edit.
+               - The create form provides an editable 'source_location_type' dropdown.
+               - The edit form provides a disabled 'source_location_type_display' field. {% endcomment %}
+            {% if form.source_location_type %}
+                {% include "partials/_form_field.html" with field=form.source_location_type %}
+            {% else %}
+                {% include "partials/_form_field.html" with field=form.source_location_type_display %}
+            {% endif %}
+        </div>
+
+        <div class="form-actions">
+            <a href="{% url 'location_configuration:locations' %}" class="btn btn-gray">Cancel</a>
+            <button type="submit" class="btn btn-green">Save</button>
+        </div>
+    </form>
+{% endblock content %}

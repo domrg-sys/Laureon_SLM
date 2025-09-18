@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% comment %}
+Renders the form for creating and updating LocationType objects.
+
+This template uses a two-column layout to organize the form fields. It
+includes a special data attribute, `data-toggles-fields`, which hooks into the
+global JavaScript file (`main.js`) to provide interactive field visibility for
+the grid dimension fields.
+
+Context Variables:
+  - form: An instance of LocationTypeCreateForm or LocationTypeEditForm.
+  - page_title: The title to be displayed at the top of the page.
+{% endcomment %}
+
+{% block page_title %}
+    {{ page_title }}
+{% endblock page_title %}
+
+{% block content %}
+    <form method="post" novalidate>
+        {% csrf_token %}
+        {% include "partials/_form_errors.html" with form=form %}
+
+        <div class="form-layout-grid">
+            {% comment %} --- Left Column --- {% endcomment %}
+            <div class="form-column-left">
+                <div class="form-section">
+                    <h2 class="form-section-title">General</h2>
+                    {% include "partials/_form_field.html" with field=form.name %}
+                </div>
+
+                <div class="form-section">
+                    <h2 class="form-section-title">Rules</h2>
+                    {% include "partials/_form_field.html" with field=form.can_store_samples type="checkbox" %}
+
+                    {% comment %} This container is targeted by JavaScript to toggle the visibility
+                       of the grid dimension fields based on the 'can_have_spaces' checkbox. {% endcomment %}
+                    <div id="space-toggle-section" data-toggles-fields>
+                        {% include "partials/_form_field.html" with field=form.can_have_spaces type="checkbox" %}
+                        <div class="form-field-group">
+                            {% include "partials/_form_field.html" with field=form.space_rows %}
+                            {% include "partials/_form_field.html" with field=form.space_cols %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% comment %} --- Right Column --- {% endcomment %}
+            <div class="form-column-right">
+                <div class="form-section">
+                    <h2 class="form-section-title">Allowed Parent Types</h2>
+                    {% include "partials/_form_field.html" with field=form.allowed_parent_types %}
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a href="{% url 'location_configuration:types' %}" class="btn btn-gray">Cancel</a>
+            <button type="submit" class="btn btn-green">Save</button>
+        </div>
+    </form>
+{% endblock content %}

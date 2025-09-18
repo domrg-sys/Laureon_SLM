@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% comment %}
+Displays a confirmation page for the bulk deletion of multiple samples.
+
+This template lists all the samples that a user has selected for deletion
+and asks for final confirmation. The form submits the primary keys of these
+samples to the `sample_bulk_delete_perform` view to carry out the deletion.
+
+Context Variables:
+  - samples_to_delete: A queryset or list of the SampleItem objects that
+                       are slated for deletion.
+  - location_pk: The primary key of the parent location, used to build the
+                 URLs for the form action and the "Cancel" button.
+{% endcomment %}
+
+{% block page_title %}
+    Confirm Bulk Deletion
+{% endblock page_title %}
+
+{% block content %}
+    <p>
+        Are you sure you want to delete the following
+        <strong>{{ samples_to_delete|length }}</strong> sample(s)?
+    </p>
+
+    {# Display a scrollable list of the samples to be deleted. #}
+    <ul class="item-list-condensed">
+        {% for sample in samples_to_delete %}
+            <li>{{ sample.name }}</li>
+        {% endfor %}
+    </ul>
+
+    <p>This action cannot be undone.</p>
+
+    <form method="post" action="{% url 'sample_control:sample_bulk_delete_perform' location_pk=location_pk %}">
+        {% csrf_token %}
+
+        {# Include hidden inputs for each selected sample's primary key. #}
+        {% for sample in samples_to_delete %}
+            <input type="hidden" name="selected_samples" value="{{ sample.pk }}">
+        {% endfor %}
+
+        <div class="form-actions">
+            <a href="{% url 'sample_control:sample_location_detail' location_pk=location_pk %}" class="btn btn-gray">Cancel</a>
+            <button type="submit" class="btn btn-red">Confirm Delete</button>
+        </div>
+    </form>
+{% endblock content %}

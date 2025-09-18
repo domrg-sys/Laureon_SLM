@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% comment %}
+Displays the results of a sample search.
+
+This template renders a table listing all the SampleItem objects that match
+a user's search query. If no samples are found, it displays a "No samples
+found" message instead.
+
+Context Variables:
+  - samples: A queryset or list of the SampleItem objects to display.
+  - query: The original search string entered by the user.
+{% endcomment %}
+
+{% block page_actions_top %}
+    <div class="page-actions-top-left">
+        <a href="{% url 'sample_control:sample_control' %}" class="btn btn-gray">
+            <span class="material-symbols-outlined">arrow_back</span>
+            Back to Sample Control
+        </a>
+    </div>
+{% endblock page_actions_top %}
+
+{% block page_title %}
+    Sample Search Results
+{% endblock page_title %}
+
+{% block content %}
+    <h2>Search Results for "{{ query }}"</h2>
+
+    {% if samples %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Catalog Number</th>
+                    <th>Lot Number</th>
+                    <th class="cell-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sample in samples %}
+                    <tr>
+                        <td>{{ sample.name }}</td>
+                        <td>{{ sample.catalog_number|default:"-" }}</td>
+                        <td>{{ sample.lot_number|default:"-" }}</td>
+                        <td class="cell-center">
+                            {% comment %} This link includes URL parameters to allow the detail page's
+                               "Back" button to correctly return to these search results. {% endcomment %}
+                            <a
+                                href="{% url 'sample_control:sample_detail' sample_pk=sample.pk %}?from_search=true&q={{ query|urlencode }}"
+                                class="btn-icon btn-icon-blue"
+                                title="View Details"
+                            >
+                                <span class="material-symbols-outlined">visibility</span>
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No samples found for "{{ query }}"</p>
+    {% endif %}
+
+    {% if is_paginated %}
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?q={{ query|urlencode }}&page=1" class="btn btn-gray">&laquo; first</a>
+                <a href="?q={{ query|urlencode }}&page={{ page_obj.previous_page_number }}" class="btn btn-gray">previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?q={{ query|urlencode }}&page={{ page_obj.next_page_number }}" class="btn btn-gray">next</a>
+                <a href="?q={{ query|urlencode }}&page={{ page_obj.paginator.num_pages }}" class="btn btn-gray">last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+    {% endif %}
+{% endblock content %}

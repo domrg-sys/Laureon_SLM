@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% comment %}
+Displays the detailed view of a selected location, showing its samples.
+
+This template acts as the main view for interacting with samples within a
+specific location. It displays the location's hierarchical path (breadcrumb)
+and then conditionally includes either a grid view (for locations with spaces)
+or a table view (for locations without spaces).
+
+It also contains the toolbar and form setup for handling bulk add and bulk
+delete operations, which are controlled by the main JavaScript file.
+
+Context Variables:
+  - selected_location: The Location object instance being displayed.
+  - location_path: A list of locations representing the path from the root to
+                   the selected location.
+  - grid (optional): A 2D list for rendering the space grid, if applicable.
+  - samples (optional): A queryset of samples, if the location is not a grid.
+{% endcomment %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/space_grid.css' %}">
+{% endblock extra_css %}
+
+{% block page_actions_top %}
+    <div class="page-actions-top-left">
+        <a href="{% url 'sample_control:sample_control' %}" class="btn btn-gray">
+            <span class="material-symbols-outlined">arrow_back</span>
+            Back to Sample Control
+        </a>
+    </div>
+{% endblock page_actions_top %}
+
+{% block page_title %}
+    {{ selected_location.name }}
+{% endblock page_title %}
+
+{% block content %}
+    {# --- Breadcrumb Navigation --- #}
+    <div class="location-path">
+        {% for location in location_path %}
+            {{ location.name }}{% if not forloop.last %} &gt; {% endif %}
+        {% endfor %}
+    </div>
+
+    {# --- Conditional Rendering: Grid vs. Table --- #}
+    {% if selected_location.source_location_type.can_have_spaces %}
+        {# For locations with spaces, display the grid and its associated bulk action forms. #}
+
+        {# The bulk delete form wraps the toolbar and contains a placeholder for hidden inputs. #}
+        <form id="bulk-delete-form" method="POST" action="{% url 'sample_control:sample_bulk_delete' location_pk=selected_location.pk %}">
+            {% csrf_token %}
+            <div class="table-toolbar">
+                <div class="toolbar-button-group" id="bulk-add-controls">
+                    <button type="button" class="btn btn-green" id="bulk-add-toggle-btn">
+                        <span class="material-symbols-outlined">playlist_add</span>
+                        Bulk Add
+                    </button>
+                    <button type="button" class="btn btn-gray" id="bulk-add-cancel-btn" style="display: none;">Cancel Add</button>
+                    <button type="submit" class="btn btn-green" id="bulk-add-proceed-btn" style="display: none;" disabled form="bulk-add-form-actual">
+                        Add to <span id="bulk-add-count">0</span> Selected
+                    </button>
+                </div>
+                <div class="toolbar-button-group" id="bulk-delete-controls">
+                    <button type="button" class="btn btn-red" id="bulk-delete-toggle-btn">
+                        <span class="material-symbols-outlined">delete</span>
+                        Bulk Delete
+                    </button>
+                    <button type="button" class="btn btn-gray" id="bulk-delete-cancel-btn" style="display: none;">Cancel Delete</button>
+                    <button type="submit" class="btn btn-red" id="bulk-delete-proceed-btn" style="display: none;" disabled>
+                        Delete <span id="bulk-delete-count">0</span> Selected
+                    </button>
+                </div>
+            </div>
+            <div id="bulk-delete-hidden-inputs"></div>
+        </form>
+
+        {# The bulk add form is separate and is submitted by the "Add to Selected" button above. #}
+        <form id="bulk-add-form-actual" method="POST" action="{% url 'sample_control:sample_bulk_add_form' location_pk=selected_location.pk %}">
+            {% csrf_token %}
+            <div id="bulk-add-hidden-inputs"></div>
+        </form>
+
+        <div class="grid-container-scrollable">
+            {% include "sample_control/partials/_location_detail_grid.html" %}
+        </div>
+    {% else %}
+        {# For locations without spaces, display the sample table. #}
+        {% include "sample_control/partials/_location_detail_table.html" %}
+    {% endif %}
+
+{% endblock content %}

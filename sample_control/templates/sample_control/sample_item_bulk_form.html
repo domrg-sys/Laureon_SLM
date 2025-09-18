@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% load grid_helpers %}
+
+{% comment %}
+Displays the form for bulk-adding samples to a location.
+
+This template provides a two-tab interface for bulk creation:
+1.  "Single Sample": Allows the user to define one sample that will be
+    created multiple times.
+2.  "Paste from Spreadsheet": Allows the user to paste data to create
+    multiple, unique samples at once.
+
+Context Variables:
+  - parent_location: The Location object to which samples will be added.
+  - selected_spaces: A list of coordinate strings (e.g., "1,1", "1,2") if
+                     the user is adding to specific spaces in a grid.
+  - count: An integer representing the number of samples to create if the
+           user is adding to a non-grid location.
+  - single_form: An instance of the BulkCreateSingleSampleForm.
+  - paste_form: An instance of the BulkCreatePasteForm.
+{% endcomment %}
+
+{% block page_title %}
+    Bulk Add Samples to {{ parent_location.name }}
+{% endblock page_title %}
+
+{% block content %}
+    {# --- Target Information Section --- #}
+    <div class="form-section">
+        <h2 class="form-section-title">Target</h2>
+        {% if selected_spaces %}
+            <p>You are adding samples to the following <strong>{{ selected_spaces|length }}</strong> space(s):</p>
+            <div class="coord-list">
+                {% for space in selected_spaces %}
+                    <span class="coord-item">{{ space|cut:","|first|to_row_letter }}{{ space|cut:","|last }}</span>
+                {% endfor %}
+            </div>
+        {% elif count %}
+            <p>You are about to create <strong>{{ count }}</strong> new sample(s) in {{ parent_location.name }}.</p>
+        {% endif %}
+    </div>
+
+    {# --- Tab Navigation --- #}
+    <div class="tab-nav-form">
+        <button class="tab-link-form is-active" data-tab="single">Single Sample</button>
+        <button class="tab-link-form" data-tab="paste">Paste from Spreadsheet</button>
+    </div>
+
+    <div id="single" class="tab-content-form is-active">
+        <form method="POST" action="{% url 'sample_control:sample_bulk_add_form' location_pk=parent_location.pk %}" class="form-container">
+            {% csrf_token %}
+            {% if selected_spaces %}
+                {% for space in selected_spaces %}
+                    <input type="hidden" name="selected_spaces" value="{{ space }}">
+                {% endfor %}
+            {% elif count %}
+                 <input type="hidden" name="count" value="{{ count }}">
+            {% endif %}
+            <input type="hidden" name="form_type" value="single">
+
+            <div class="form-section">
+                <p>Fill out the information below. One sample with these details will be created for each target location/space.</p>
+                {% include "partials/_form_field.html" with field=single_form.name %}
+                {% include "partials/_form_field.html" with field=single_form.catalog_number %}
+                {% include "partials/_form_field.html" with field=single_form.lot_number %}
+                {% include "partials/_form_field.html" with field=single_form.description %}
+            </div>
+            <div class="form-actions">
+                <a href="{% url 'sample_control:sample_location_detail' location_pk=parent_location.pk %}" class="btn btn-gray">Cancel</a>
+                <button type="submit" class="btn btn-green">Create Samples</button>
+            </div>
+        </form>
+    </div>
+
+    <div id="paste" class="tab-content-form">
+        <form method="POST" action="{% url 'sample_control:sample_bulk_add_form' location_pk=parent_location.pk %}" class="form-container">
+            {% csrf_token %}
+            {% if selected_spaces %}
+                {% for space in selected_spaces %}
+                    <input type="hidden" name="selected_spaces" value="{{ space }}">
+                {% endfor %}
+            {% elif count %}
+                 <input type="hidden" name="count" value="{{ count }}">
+            {% endif %}
+            <input type="hidden" name="form_type" value="paste">
+
+            <div class="form-section">
+                 <p>
+                     Paste tab-separated data below. The number of rows must match the number of targets
+                     (<strong>{% if selected_spaces %}{{ selected_spaces|length }}{% else %}{{ count }}{% endif %}</strong>).
+                     The columns must be in the order: <strong>Name, Catalog Number, Lot Number, Description</strong>.
+                 </p>
+                {% include "partials/_form_field.html" with field=paste_form.data %}
+            </div>
+             <div class="form-actions">
+                <a href="{% url 'sample_control:sample_location_detail' location_pk=parent_location.pk %}" class="btn btn-gray">Cancel</a>
+                <button type="submit" class="btn btn-green">Create Samples</button>
+            </div>
+        </form>
+    </div>
+
+{% endblock content %}

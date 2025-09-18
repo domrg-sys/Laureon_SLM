@@ -1,0 +1,25 @@
+{% comment %}
+Renders a single form field with its label and input element.
+
+This partial standardizes the rendering of form fields and handles the
+structural difference between standard inputs (like text, select) and
+checkboxes, which often require different styling.
+
+Context Variables:
+  - field: The Django form field object to be rendered.
+  - type (optional): A string that can be set to "checkbox" to apply
+                     checkbox-specific wrapper classes.
+{% endcomment %}
+
+{% if type == "checkbox" %}
+    <div class="form-field-checkbox">
+        {{ field.label_tag }}
+        {{ field }}
+    </div>
+{% else %}
+    {# Default wrapper for standard text inputs, selects, textareas, etc. #}
+    <div class="form-field">
+        {{ field.label_tag }}
+        {{ field }}
+    </div>
+{% endif %}

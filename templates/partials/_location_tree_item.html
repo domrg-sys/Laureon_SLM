@@ -1,0 +1,35 @@
+{% comment %}
+Renders a single item in the recursive location tree.
+
+This template is responsible for the structural `<li>` element of a tree node
+and its child `<ul>` container. It includes the `_location_tree_item_content.html`
+partial to render the actual details (name, icons, etc.).
+
+The template then recursively includes itself for each child of the current
+location, which is how the entire tree is built.
+
+Context Variables:
+  - location: The Location object instance to render.
+  - show_actions (optional): A boolean passed down to the content partial to
+                            show/hide action buttons.
+{% endcomment %}
+
+{% with children=location.effective_children %}
+<li class="tree-item"{% if children %} data-parent="true"{% endif %}>
+    <div class="tree-item-content">
+        {# Include the shared partial to render the item's details and actions. #}
+        {% include "partials/_location_tree_item_content.html" with location=location children=children show_actions=show_actions %}
+    </div>
+
+    {# If the location has children, create a nested list for them. #}
+    {% if children %}
+        <ul id="children-{{ location.pk }}" class="location-tree-children collapsed">
+            {% for child in children %}
+                {# --- RECURSION --- #}
+                {# Recursively include this template for each child location. #}
+                {% include 'partials/_location_tree_item.html' with location=child show_actions=show_actions %}
+            {% endfor %}
+        </ul>
+    {% endif %}
+</li>
+{% endwith %}

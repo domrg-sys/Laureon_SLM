@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% comment %}
+Displays the detailed information for a single SampleItem.
+
+This template shows all the relevant fields for a sample and provides action
+buttons to edit, delete, or navigate to its parent location. It also includes
+logic to conditionally change the "Back" button's destination based on whether
+the user arrived from a search results page.
+
+Context Variables:
+  - object: The SampleItem instance being displayed (passed by DetailView).
+  - parent_location: The parent Location object of the sample.
+  - location_path: A list of locations for rendering the breadcrumb.
+  - from_search: A boolean indicating if the user came from the search page.
+  - search_query: The original search query, if applicable.
+{% endcomment %}
+
+{% block page_actions_top %}
+    <div class="page-actions-top-left">
+        {# The "Back" button's link changes based on the user's navigation path. #}
+        {% if from_search %}
+            <a href="{% url 'sample_control:sample_search_results' %}?q={{ search_query|urlencode }}" class="btn btn-gray">
+                <span class="material-symbols-outlined">arrow_back</span>
+                Back to Search Results
+            </a>
+        {% elif parent_location %}
+            <a href="{% url 'sample_control:sample_location_detail' location_pk=parent_location.pk %}" class="btn btn-gray">
+                <span class="material-symbols-outlined">arrow_back</span>
+                Back to {{ parent_location.name }}
+            </a>
+        {% endif %}
+    </div>
+{% endblock page_actions_top %}
+
+{% block page_title %}
+    Sample Information
+{% endblock page_title %}
+
+{% block content %}
+    <div class="form-section">
+        <dl class="detail-view-grid">
+            <dt>Name:</dt>
+            <dd>{{ object.name }}</dd>
+
+            <dt>Catalog Number:</dt>
+            <dd>{{ object.catalog_number|default:"-" }}</dd>
+
+            <dt>Lot Number:</dt>
+            <dd>{{ object.lot_number|default:"-" }}</dd>
+
+            <dt>Description:</dt>
+            <dd>{{ object.description|default:"-" }}</dd>
+
+            <dt>Location:</dt>
+            <dd>
+                {% for location in location_path %}
+                    {{ location.name }}{% if not forloop.last %} &gt; {% endif %}
+                {% endfor %}
+            </dd>
+        </dl>
+    </div>
+
+    <div class="form-actions form-actions--no-border">
+        <a href="{% url 'sample_control:sample_location_detail' location_pk=parent_location.pk %}" class="btn btn-gray">
+            <span class="material-symbols-outlined">arrow_forward</span>
+            Go To Location
+        </a>
+        <a href="{% url 'sample_control:sample_edit' sample_pk=object.pk %}" class="btn btn-blue">
+            <span class="material-symbols-outlined">edit</span>
+            Edit
+        </a>
+        <a href="{% url 'sample_control:sample_delete' sample_pk=object.pk %}" class="btn btn-red">
+            <span class="material-symbols-outlined">delete</span>
+            Delete
+        </a>
+    </div>
+{% endblock content %}

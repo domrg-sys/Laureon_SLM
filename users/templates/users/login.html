@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block page_title %}
+    Log In
+{% endblock page_title %}
+
+{% block content %}
+    <form method="post" class="form-container">
+        {% csrf_token %}
+        {% include "partials/_form_errors.html" with form=form %}
+
+        <div class="form-section">
+            {% include "partials/_form_field.html" with field=form.username %}
+            {% include "partials/_form_field.html" with field=form.password %}
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-green">Log In</button>
+        </div>
+    </form>
+{% endblock content %}

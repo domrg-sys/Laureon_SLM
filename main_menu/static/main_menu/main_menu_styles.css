@@ -1,0 +1,74 @@
+/**
+ * Styles for the main menu page, featuring a responsive grid of large,
+ * clickable navigation buttons.
+ */
+
+/* ==========================================================================
+   1. Grid Container
+   ========================================================================== */
+
+.main-menu-grid {
+    display: grid;
+    /*
+     * Create a responsive grid:
+     * - 'auto-fit' tells the grid to fit as many columns as possible.
+     * - 'minmax(250px, 1fr)' defines the column size. Each column will be at
+     * least 250px wide and can grow to fill available space (1fr),
+     * creating a fluid and responsive layout without media queries.
+     */
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+/* ==========================================================================
+   2. Menu Buttons
+   ========================================================================== */
+
+.btn-menu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 3rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-decoration: none;
+    letter-spacing: 1px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+    /* A performance hint for the browser that these properties will change. */
+    will-change: transform, box-shadow;
+}
+
+/* --- Interactive States --- */
+
+/* Hover and active states for clickable menu buttons */
+.btn-menu:not(.btn-menu--disabled):hover {
+    transform: translateY(-4px); /* Slight lift effect */
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-menu:not(.btn-menu--disabled):active {
+    transform: translateY(-1px); /* Subtle press-down effect */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Icon Sizing --- */
+
+.btn-menu .material-symbols-outlined {
+    font-size: 3rem;
+}
+
+/* --- Disabled State --- */
+
+/* A disabled state that matches the visual style of the menu buttons */
+.btn-menu--disabled {
+    background-color: var(--color-gray-1);
+    color: var(--color-gray-3);
+    border: 1px dashed var(--color-gray-2);
+    box-shadow: none;
+    cursor: not-allowed;
+}
