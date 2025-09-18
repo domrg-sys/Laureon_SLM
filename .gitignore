@@ -26,3 +26,4 @@ Thumbs.db
 # In a real project, you might handle these differently, but for now,
 # ignoring the local development media folder is a good practice.
 /media/
+/staticfiles/
