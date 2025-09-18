@@ -2,6 +2,13 @@
 
 Laureon SLM is a web application built with Django for managing and tracking the physical locations of laboratory samples. It provides a hierarchical system for defining storage locations and a control interface for managing the samples within them.
 
+## Table of Contents
+- [Key Features](#key-features)
+- [Local Development Setup](#local-development-setup)
+- [Production Deployment Notes](#production-deployment-notes)
+
+---
+
 ## Key Features
 
 * **Hierarchical Location Configuration**: Define multi-level storage locations (e.g., Room > Freezer > Rack > Box) with custom rules.
