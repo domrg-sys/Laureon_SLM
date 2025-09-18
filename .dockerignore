@@ -1,0 +1,25 @@
+# Git and project management
+.git
+.gitignore
+.dockerignore
+README.md
+LICENSE
+
+# Python virtual environment and cache
+env/
+venv/
+*.pyc
+__pycache__/
+
+# Local development settings
+.env
+db.sqlite3
+
+# Test files and directories (THIS IS THE KEY PART)
+**/tests.py
+**/tests/
+test*.py
+pytest.ini
+
+# Other development tools
+.vscode/
