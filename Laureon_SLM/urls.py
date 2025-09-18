@@ -16,6 +16,7 @@ from django.views.generic.base import RedirectView
 # --- Group all application-specific URLs together ---
 # These will all be prefixed with /slm/
 slm_patterns = [
+    path('', RedirectView.as_view(url='main_menu/', permanent=False)),
     path('main_menu/', include('main_menu.urls')),
     path('location_configuration/', include('location_configuration.urls')),
     path('sample_control/', include('sample_control.urls')),
