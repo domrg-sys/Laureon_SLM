@@ -1,7 +1,13 @@
-asgiref==3.9.1
-Django==4.2.23
-django-environ==0.12.0
+# Django and Database
+django==4.2.23
 psycopg2-binary==2.9.10
+django-environ==0.12.0
+
+# Production Web Server
+gunicorn==21.2.0
+
+# Other dependencies
+asgiref==3.9.1
 python-decouple==3.8
 sqlparse==0.5.3
 typing_extensions==4.14.1
