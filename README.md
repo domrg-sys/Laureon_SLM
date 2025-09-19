@@ -3,9 +3,18 @@
 Laureon SLM is a web application built with Django for managing and tracking the physical locations of laboratory samples. It provides a hierarchical system for defining storage locations and a control interface for managing the samples within them.
 
 ## Table of Contents
+- [Technology Stack](#technology-stack)
 - [Key Features](#key-features)
 - [Local Development Setup](#local-development-setup)
-- [Production Deployment Notes](#production-deployment-notes)
+- [Production Deployment](#production-deployment)
+
+---
+
+## Technology Stack
+
+* **Backend**: Python, Django
+* **Database**: PostgreSQL
+* **Deployment**: Docker, Gunicorn
 
 ---
 
@@ -62,16 +71,12 @@ These instructions will get you a copy of the project up and running on your loc
     ```
 
 3.  **Install the required packages:**
-    * This project requires a PostgreSQL database. First, install the database driver:
+
+    The `requirements.txt` file includes the database driver and all other dependencies.
       
-        ```bash
-        pip install psycopg2-binary
-        ```
-    * Then, install the rest of the application's dependencies:
-      
-        ```bash
-        pip install -r requirements.txt
-        ```
+    ```bash
+    pip install -r requirements.txt
+    ```
 
 4.  **Create the local environment variables file (`.env`):**
     * In the root of the project, create a new file named `.env`.
@@ -104,15 +109,16 @@ These instructions will get you a copy of the project up and running on your loc
 
 ---
 
-## Production Deployment Notes
+## Production Deployment
 
 This section provides a checklist for deploying the application to a production environment.
 
 1.  **Production Environment Variables (`.env`):**
-    * Your production server must have its own `.env` file with production-specific settings. **Do not commit your production `.env` file to Git.**
-    * The `SECRET_KEY` must be a different, long, and random value.
-    * `DEBUG` must be set to `False`.
-    * `ALLOWED_HOSTS` should be a comma-separated list of your production domain(s) (e.g., `laureon.com,www.laureon.com`).
+    - Your production server must have its own `.env` file with production-specific settings. **Do not commit your production `.env` file to Git.**
+    - The `SECRET_KEY` must be a different, long, and random value.
+    - `DEBUG` must be set to `False`.
+    - `ALLOWED_HOSTS` should be a comma-separated list of your production domain(s) (e.g., `laureon.com,www.laureon.com`).
+    - The `DATABASE_URL` must point to your production database. If the database is running on the same host machine as the Docker container, use `host.docker.internal` as the hostname.
       
         ```env
         # .env - PRODUCTION SETTINGS
@@ -120,7 +126,7 @@ This section provides a checklist for deploying the application to a production 
         DEBUG=False
         ALLOWED_HOSTS=laureon.com,www.laureon.com
         DATABASE_URL='postgres://ProdUser:ProdPassword@prod-db-host:5432/laureon_slm_prod_db'
-
+        
         # --- Security Settings ---
         SECURE_SSL_REDIRECT=True
         SESSION_COOKIE_SECURE=True
@@ -130,14 +136,24 @@ This section provides a checklist for deploying the application to a production 
         SECURE_HSTS_PRELOAD=True
         ```
 
-2.  **Collect Static Files:**
-    * Before deploying, you must run the `collectstatic` command. This gathers all static files (CSS, JavaScript, images) into a single directory for your web server.
-      
-        ```bash
-        python manage.py collectstatic
-        ```
-    * Your web server (e.g., Nginx) should be configured to serve files from the `staticfiles` directory that this command creates.
+2.  **Build the Docker Image:**
+    From your project's root directory on the production server, run the build command. This command reads the `Dockerfile`, builds your application into an image, and tags it with a name (e.g., `laureon-slm`):
 
-3.  **Web Server and WSGI:**
-    * Do not use the Django development server (`runserver`) in production.
-    * You need to use a production-grade WSGI server like **Gunicorn** or **uWSGI** to run the application, typically behind a reverse proxy web server like **Nginx**.
+    ```bash
+    docker build -t laureon-slm .
+    ```
+
+    The `Dockerfile` automatically handles several key production steps during the `docker build` process:
+    
+    * **Web Server and WSGI:** The image is configured to use Gunicorn as the production-grade WSGI server. You do not need to install or run it manually.
+    
+    * **Collect Static Files:** The `python manage.py collectstatic` command is run automatically during the image build, so all static assets are collected and ready to be served.
+
+3.  **Run the Container:**
+    Execute the following command to start your application container:
+  
+    ```bash
+    docker run -d --env-file .env -p 8000:8000 --name laureon-container laureon-slm
+    ```
+
+    Your application is now running and accessible on port 8000.
